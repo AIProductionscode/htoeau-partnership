@@ -4,7 +4,8 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  initFanCodeCopy();
+  initFanOfferForm();
+  initPromoModal();
   initSmoothScroll();
   initScrollReveal();
   initNewsletterForm();
@@ -13,43 +14,179 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * 1. Fan Code Copy Action
- * Copies CLARET15 to clipboard.
- * Changes button text to 'COPIED.' for exactly 1.5 seconds, then restores 'COPY CODE'.
- * No toasts, popups, or bouncing overlays.
+ * 1. Fan Offer Email Form Handler
+ * Validates the email address via native constraint validation.
+ * Opens the promotional modal when valid.
+ * Structured to cleanly decouple submission handling from modal presentation.
  */
-function initFanCodeCopy() {
-  const btnCopy = document.getElementById('btn-copy-code');
-  if (!btnCopy) return;
+function initFanOfferForm() {
+  const form = document.getElementById('fan-offer-form');
+  const emailInput = document.getElementById('fan-offer-email');
+  if (!form || !emailInput) return;
 
-  const codeToCopy = 'CLARET15';
-  let resetTimer = null;
+  form.addEventListener('submit', (e) => {
+    // 1. Prevent default page reload
+    e.preventDefault();
 
-  btnCopy.addEventListener('click', async () => {
-    let success = false;
-
-    if (navigator.clipboard && window.isSecureContext) {
-      try {
-        await navigator.clipboard.writeText(codeToCopy);
-        success = true;
-      } catch (err) {
-        success = fallbackCopyText(codeToCopy);
-      }
-    } else {
-      success = fallbackCopyText(codeToCopy);
+    // 2. Check native validity (format and required)
+    if (!emailInput.checkValidity()) {
+      // 3. Allow native validation bubble/message to display; do not open modal
+      emailInput.reportValidity();
+      return;
     }
 
-    if (success) {
-      btnCopy.textContent = 'COPIED.';
-      btnCopy.setAttribute('aria-label', 'Code CLARET15 copied to clipboard');
+    const emailValue = emailInput.value.trim();
 
-      if (resetTimer) clearTimeout(resetTimer);
-      resetTimer = setTimeout(() => {
-        btnCopy.textContent = 'COPY CODE';
-        btnCopy.setAttribute('aria-label', 'Copy Fan Code CLARET15');
-      }, 1500);
+    // =========================================================================
+    // FUTURE BACKEND INTEGRATION POINT:
+    // Connect backend API, newsletter provider, or dynamic discount generation
+    // here (e.g. await submitFanOfferEmail(emailValue);).
+    // Note: Do not store email in localStorage/cookies, and do not pretend email
+    // has been registered or verified.
+    // =========================================================================
+
+    // 4. Open promotional modal upon valid email entry
+    openPromoModal();
+  });
+}
+
+/**
+ * 2. Promotional Modal Management
+ * Handles accessible opening, closing, keyboard trapping, body scroll locking,
+ * and independent discount code copying.
+ */
+let lastFocusedElement = null;
+
+function openPromoModal() {
+  const modal = document.getElementById('promo-modal');
+  const closeBtn = document.getElementById('modal-close-btn');
+  if (!modal) return;
+
+  // Store current active element to restore focus on close
+  lastFocusedElement = document.activeElement;
+
+  // Reveal modal and lock background scrolling
+  modal.removeAttribute('hidden');
+  modal.classList.add('is-open');
+  document.body.classList.add('modal-open');
+
+  // Move keyboard focus inside modal
+  if (closeBtn) {
+    closeBtn.focus();
+  }
+}
+
+function closePromoModal() {
+  const modal = document.getElementById('promo-modal');
+  if (!modal || modal.hasAttribute('hidden')) return;
+
+  modal.classList.remove('is-open');
+  modal.setAttribute('hidden', '');
+  document.body.classList.remove('modal-open');
+
+  // Restore focus to the GET CODE button (or previous trigger)
+  if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+    lastFocusedElement.focus();
+  } else {
+    const btnGetCode = document.getElementById('btn-get-code');
+    if (btnGetCode) btnGetCode.focus();
+  }
+}
+
+function initPromoModal() {
+  const modal = document.getElementById('promo-modal');
+  const dialog = document.getElementById('promo-modal-dialog');
+  const closeBtn = document.getElementById('modal-close-btn');
+  const copyBtn = document.getElementById('btn-modal-copy-code');
+  if (!modal) return;
+
+  // Close modal via close button
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      closePromoModal();
+    });
+  }
+
+  // Close modal when clicking outside the dialog content (on backdrop)
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closePromoModal();
     }
   });
+
+  // Handle keyboard events (Escape to close, Tab trapping)
+  document.addEventListener('keydown', (e) => {
+    if (modal.hasAttribute('hidden')) return;
+
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      e.preventDefault();
+      closePromoModal();
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      trapModalFocus(e, dialog || modal);
+    }
+  });
+
+  // Modal Discount Code Copy Action
+  if (copyBtn) {
+    const codeToCopy = 'FAN-N6L75R';
+    let resetTimer = null;
+
+    copyBtn.addEventListener('click', async () => {
+      let success = false;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(codeToCopy);
+          success = true;
+        } catch (err) {
+          success = fallbackCopyText(codeToCopy);
+        }
+      } else {
+        success = fallbackCopyText(codeToCopy);
+      }
+
+      if (success) {
+        copyBtn.textContent = 'COPIED.';
+        copyBtn.setAttribute('aria-label', `Code ${codeToCopy} copied to clipboard`);
+
+        if (resetTimer) clearTimeout(resetTimer);
+        resetTimer = setTimeout(() => {
+          copyBtn.textContent = 'COPY CODE';
+          copyBtn.setAttribute('aria-label', `Copy discount code ${codeToCopy}`);
+        }, 1500);
+      }
+    });
+  }
+}
+
+/**
+ * Traps Tab and Shift+Tab keyboard focus within the modal dialog.
+ */
+function trapModalFocus(e, container) {
+  const focusableSelector = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  const focusables = Array.from(container.querySelectorAll(focusableSelector)).filter(
+    el => el.offsetParent !== null
+  );
+
+  if (focusables.length === 0) return;
+
+  const firstEl = focusables[0];
+  const lastEl = focusables[focusables.length - 1];
+
+  if (e.shiftKey) {
+    if (document.activeElement === firstEl) {
+      e.preventDefault();
+      lastEl.focus();
+    }
+  } else {
+    if (document.activeElement === lastEl) {
+      e.preventDefault();
+      firstEl.focus();
+    }
+  }
 }
 
 function fallbackCopyText(text) {

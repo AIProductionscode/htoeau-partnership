@@ -117,6 +117,7 @@
         </div>
 
         <div class="fan-offer-right">
+          <!-- Previous fan-offer ticket interaction:
           <div class="fan-ticket" id="fan-ticket">
             <div class="ticket-left">
               <span class="ticket-label">Use fan code for 15% off your first order</span>
@@ -134,6 +135,29 @@
               </a>
             </div>
           </div>
+          -->
+
+          <form class="fan-offer-form" id="fan-offer-form">
+            <label for="fan-offer-email" class="fan-offer-label">
+              ENTER YOUR EMAIL TO UNLOCK YOUR FAN OFFER
+            </label>
+
+            <div class="fan-offer-form-controls">
+              <input
+                type="email"
+                id="fan-offer-email"
+                name="email"
+                class="fan-offer-email-input"
+                placeholder="Enter your email address"
+                autocomplete="email"
+                required
+              />
+
+              <button type="submit" class="btn-get-code" id="btn-get-code">
+                GET CODE →
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </section>
@@ -454,6 +478,79 @@
       <path d="m5 12 7-7 7 7"></path>
     </svg>
   </button>
+
+  <!-- ==========================================================================
+       PROMOTIONAL FAN OFFER MODAL
+       ========================================================================== -->
+  <div class="modal-backdrop" id="promo-modal" role="dialog" aria-modal="true" aria-labelledby="promo-modal-title" hidden>
+    <div class="modal-dialog" id="promo-modal-dialog">
+      <button type="button" class="modal-close-btn" id="modal-close-btn" aria-label="Close modal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="modal-content-inner">
+        <!-- 1. HtoEAU logo -->
+        <div class="modal-logo-wrapper">
+          <div class="co-brand-lockup">
+            <div class="brand-logo-htoeau">
+              <img src="images/htoeau-logo.png" alt="HtoEAU" class="" width="120" height="38"
+                style="height: 4rem;">
+            </div>
+            <div class="brand-divider" aria-hidden="true"></div>
+            <div class="brand-logo-burnley">
+              <img src="images/burnley-crest.png" alt="Burnley Football Club Crest" class="burnley-crest-img" width="38"
+                height="44">
+              <div class="brand-burnley-text">
+                <span class="burnley-title" style="color: var(--claret);">BURNLEY</span>
+                <span class="burnley-sub" style="color: var(--claret);">FOOTBALL CLUB</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-rule" aria-hidden="true"></div>
+
+        <!-- 2. Main heading -->
+        <h2 class="modal-title" id="promo-modal-title">
+          YOUR EXCLUSIVE FAN OFFER AWAITS!
+        </h2>
+
+        <!-- 3. Supporting heading -->
+        <p class="modal-subtitle">
+          HTOEAU — PURE HYDRATION
+        </p>
+
+        <!-- 4. Introductory message -->
+        <p class="modal-intro">
+          Thank you for connecting with us! We are thrilled to share this exclusive discount with you for your next order.
+        </p>
+
+        <!-- 5 & 6. Discount-code panel -->
+        <div class="modal-code-panel">
+          <span class="modal-code-label">SINGLE USE DISCOUNT CODE:</span>
+          <div class="modal-code-box">
+            <span class="modal-code-text" id="modal-code-text">FAN-N6L75R</span>
+            <button type="button" class="btn-modal-copy" id="btn-modal-copy-code" aria-label="Copy discount code FAN-N6L75R">
+              COPY CODE
+            </button>
+          </div>
+        </div>
+
+        <!-- 7. Shop button -->
+        <a href="https://htoeau.com/htoeau-products/" class="btn-modal-shop" id="btn-modal-shop">
+          <span>SHOP NOW</span> <span aria-hidden="true">→</span>
+        </a>
+
+        <!-- 8. Terms and conditions -->
+        <p class="modal-terms">
+          Valid for 1 purchase only. Single use per customer email. Cannot be combined with other offers.
+        </p>
+      </div>
+    </div>
+  </div>
 
   <script src="js/main.js"></script>
 </body>
